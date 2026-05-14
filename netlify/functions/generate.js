@@ -8,7 +8,7 @@ const client = new OpenAI({
 });
 
 function loadPrompt(type) {
-  const file = path.join(process.cwd(), 'prompts', `${type}.md`);
+  const file = path.join(import.meta.dirname, '..', '..', 'prompts', `${type}.md`);
   return fs.readFileSync(file, 'utf-8');
 }
 

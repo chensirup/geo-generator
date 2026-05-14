@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "GEO方案生成器 - AI营销解决方案在线生成工具",
   "private": true,
+  "type": "module",
   "dependencies": {
     "openai": "^4.95.0"
   }
