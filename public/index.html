@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GEO 方案生成器</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>GEO 方案生成器</h1>
+      <p class="subtitle">AI 营销解决方案在线生成工具</p>
+    </header>
+
+    <form id="geoForm">
+      <div class="form-group">
+        <label>方案类型</label>
+        <div class="radio-group">
+          <label class="radio-card">
+            <input type="radio" name="type" value="geo" checked>
+            <span class="radio-label">
+              <strong>通用版</strong>
+              <small>品牌数字信任资产策略方案，C端+B端全覆盖，13个模块</small>
+            </span>
+          </label>
+          <label class="radio-card">
+            <input type="radio" name="type" value="geo-b">
+            <span class="radio-label">
+              <strong>B端版</strong>
+              <small>按需求阶段分类词包，侧重厂家/供应商/代工搜索场景，5个模块</small>
+            </span>
+          </label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="brand_info">品牌/公司信息 <span class="required">*</span></label>
+        <textarea id="brand_info" name="brand_info" rows="4" placeholder="例如：福建盛匠食品有限公司，主营虾滑产业链，拥有盛匠和虾鲜森自有品牌..." required></textarea>
+      </div>
+
+      <div class="form-group" id="productInfoGroup">
+        <label for="product_info">产品/服务信息</label>
+        <textarea id="product_info" name="product_info" rows="3" placeholder="例如：专注于虾滑及水产品加工，主要客户是餐饮连锁品牌，提供虾滑及水产品半成品"></textarea>
+      </div>
+
+      <div class="form-group" id="keywordsGroup">
+        <label for="keywords">核心业务关键词 <small>（选填，不填则由 AI 自动分析）</small></label>
+        <textarea id="keywords" name="keywords" rows="2" placeholder="例如：虾滑、水产预制菜、餐饮供应链"></textarea>
+      </div>
+
+      <button type="submit" id="submitBtn">生成方案</button>
+    </form>
+
+    <div id="resultArea" class="hidden">
+      <div class="result-header">
+        <h2>生成结果</h2>
+        <div class="result-actions">
+          <button id="copyBtn" title="复制到剪贴板">复制</button>
+          <button id="downloadBtn" title="下载为 .md 文件">下载</button>
+        </div>
+      </div>
+      <div id="resultContent" class="markdown-body"></div>
+    </div>
+
+    <div id="errorArea" class="hidden">
+      <p id="errorMsg"></p>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
