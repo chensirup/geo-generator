@@ -1,13 +1,14 @@
-const Anthropic = require('@anthropic-ai/sdk');
-const fs = require('fs');
-const path = require('path');
+import OpenAI from 'openai';
+import fs from 'fs';
+import path from 'path';
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
+const client = new OpenAI({
+  apiKey: process.env.ARK_API_KEY,
+  baseURL: 'https://ark.cn-beijing.volces.com/api/v3',
 });
 
 function loadPrompt(type) {
-  const file = path.join(__dirname, '..', '..', 'prompts', `${type}.md`);
+  const file = path.join(process.cwd(), 'prompts', `${type}.md`);
   return fs.readFileSync(file, 'utf-8');
 }
 
@@ -60,39 +61,35 @@ export default async (request) => {
     });
   }
 
-  if (!process.env.ANTHROPIC_API_KEY) {
-    return new Response(JSON.stringify({ error: '服务端未配置 API Key' }), {
+  if (!process.env.ARK_API_KEY || !process.env.ARK_ENDPOINT_ID) {
+    return new Response(JSON.stringify({ error: '服务端未配置 API Key 或模型接入点' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
     });
   }
 
   const prompt = buildPrompt(type, { brand_info, product_info, keywords });
-
   const encoder = new TextEncoder();
+
   const stream = new ReadableStream({
     async start(controller) {
       try {
-        const msgStream = anthropic.messages.stream({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 16000,
+        const response = await client.chat.completions.create({
+          model: process.env.ARK_ENDPOINT_ID,
           messages: [{ role: 'user', content: prompt }],
+          max_tokens: 16000,
+          stream: true,
         });
 
-        msgStream.on('text', (text) => {
-          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text })}\n\n`));
-        });
+        for await (const chunk of response) {
+          const content = chunk.choices?.[0]?.delta?.content;
+          if (content) {
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text: content })}\n\n`));
+          }
+        }
 
-        msgStream.on('end', () => {
-          controller.enqueue(encoder.encode('data: [DONE]\n\n'));
-          controller.close();
-        });
-
-        msgStream.on('error', (err) => {
-          console.error('Stream error:', err);
-          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ error: err.message })}\n\n`));
-          controller.close();
-        });
+        controller.enqueue(encoder.encode('data: [DONE]\n\n'));
+        controller.close();
       } catch (err) {
         console.error('API error:', err);
         controller.enqueue(encoder.encode(`data: ${JSON.stringify({ error: err.message })}\n\n`));
