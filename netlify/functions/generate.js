@@ -362,4 +362,5 @@ export default async (request) => {
 
 export const config = {
   path: '/api/generate',
+  maxDuration: 300,
 };
